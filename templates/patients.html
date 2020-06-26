@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>Patients Details</h1>
+	<table border="1">
+		<tr>
+			<td><b>SSN</b></td>
+			<td><b>patient id</b></td>
+			<td><b>patient name</b></td>
+			<td><b>home address</b></td>
+			<td><b>age</b></td>
+			<td><b>admitted on</b></td>
+			<td><b>room type</b></td>
+			<td><b>status</b></td>
+		</tr>
+	{% for patient in patient_details %}
+		<tr>
+		{% for i in patient %}
+			<td>{{ i }} </td>
+		{% endfor %}
+		</tr>
+	{% endfor %}
+	</table>
+{% endblock %}
