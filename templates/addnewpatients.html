@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<form method="POST" action="/addnewpatient">
+		Enter SSN : <input type="text" name="p_ssn" pattern="[0-9]{9}" placeholder="enter SSN" required/> <br/><br/>
+		Enter Patient Name : <input type="text" name="p_name" pattern="[A-Z a-z]{3,}" placeholder="enter patient name" required/> <br/><br/>
+		Enter Patient Age : <input type="number" name="p_age" placeholder="enter patient age" min="1" max="130" style="width: 120px;" required/><br/><br/>
+		Enter Home address : <textarea name="p_addr" placeholder="enter address" rows="5" cols="60" required></textarea> <br/><br/>
+		Select Room Type:
+		<select name="p_rtype" required>
+			<option value="select" selected>Select</option>
+			<option value="General">General</option>
+			<option value="Semi">Semi</option>
+			<option value="Single">Single</option>
+		</select>
+		<br><br>
+		<input type="submit" value="add patient record" />
+	</form>
+{% endblock %}
+
