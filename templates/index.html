@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<h1>Welcome to XYZ Hospital</h1>
+	<h3>This will be the login page</h3>
+
+	<!-- create navbar -->
+	<ul>
+		<li><a href="{{ url_for('indexPage') }}">Home</a></li>
+		<li><a href="{{ url_for('viewPatientDetails') }}">view all patients</a></li>
+		<li><a href="{{ url_for('addNewPatient') }}">add new patient</a></li>
+	</ul>
+
+{% endblock %}

@@ -8,6 +8,10 @@ app = Flask(__name__)
 conn = sqlite3.connect('hospital.db')
 cur = conn.cursor()
 
+## the following function is used to create the database
+## and tables inside it.
+## tables created: 
+##               -- patients 
 def createTable():	
 	cur.execute('''CREATE TABLE IF NOT EXISTS patients (
 		ws_ssn INTEGER UNIQUE,
@@ -21,13 +25,17 @@ def createTable():
 	) ''')
 	conn.commit()
 
+## return the current date in string type
+## required format in case-study YYYY-MM-DD
 def getCurrentDate():
 	p = datetime.datetime.now()
 	current_date = p.strftime("%Y-%m-%d")
 	print(f"date_today: {current_date}")
 	return current_date
 
-
+## Inserting values and data into the tables
+## inserting just for reference
+## NOTE: Call this function only once at the time of running the app for the first time.
 def insertIntoTable():
 	date_today = getCurrentDate()	
 	
@@ -39,11 +47,16 @@ def insertIntoTable():
 	print(f"INSERTED {cur.rowcount} rows")
 	conn.commit()
 
+## ========================================================================
+## =========== FLASK ROUTES and LOGIC BELOW ===============================
+## ========================================================================
 
 @app.route('/')
+@app.route('/index')
 def indexPage():
-	return "hello"
+	return render_template("index.html",pageTitle="Welcome to XYZ Hospital")
 
+## view details of all the patients present in the "patients" table
 @app.route('/patients')
 def viewPatientDetails():
 	patient_details = []
@@ -55,7 +68,10 @@ def viewPatientDetails():
 	c.close()
 	conn2.close()
 	return render_template("patients.html",patient_details=patient_details,pageTitle="patients details")
-	
+
+
+## if GET request -> returns to the add-new-patient form/html page
+## if POST request -> user has filled the "add new patient form" -> INSERT the patient details in the "patients" TABLE -> redirect to view all patients details
 @app.route('/addnewpatient',methods=['GET','POST'])
 def addNewPatient():
 	if request.method == 'POST':
