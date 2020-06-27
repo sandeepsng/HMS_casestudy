@@ -13,6 +13,7 @@ cur = conn.cursor()
 ## and tables inside it.
 ## tables created: 
 ##               -- patients 
+##               -- users (For Registration,Pharmacist,Diagnostics)
 def createTable():	
 	cur.execute('''CREATE TABLE IF NOT EXISTS patients (
 		ws_ssn INTEGER UNIQUE,
@@ -48,7 +49,10 @@ def insertIntoTable():
 	print(f"INSERTED {cur.rowcount} rows")
 	conn.commit()
 
-def get_sha256_string(password):
+## get_sha256_string(str) -> return str
+## this function is used to encrypt the input password using SHA256
+## returns the SHA256 encrypted string
+def get_sha256_string(password:str):
 	return hashlib.sha256(password.encode()).hexdigest()
 
 def create_and_insert_users():
@@ -79,7 +83,7 @@ def create_and_insert_users():
 	c.close()
 	conn.close()
 	
-
+## used for testing
 def viewUsers():
 	conn = sqlite3.connect('hospital.db')
 	c = conn.cursor()
@@ -94,11 +98,18 @@ def viewUsers():
 ## =========== FLASK ROUTES and LOGIC BELOW ===============================
 ## ========================================================================
 
+## Main page 
+## page on start up
 @app.route('/')
 @app.route('/index')
 def indexPage():
 	return render_template("index.html",pageTitle="Welcome to XYZ Hospital")
 
+## Login route
+## if the user is already logged-in (cookies are already set) -> redirect to userHomePage.html
+## if the user is NOT logged-in -> return the login page
+## if user submit login form -> check authentication -> [authorized] -> set cookies -> redirect to userHomePage.html
+##                                                   -> [NOT authorized] -> return error message
 @app.route('/login',methods=['GET','POST'])
 def login():
 	if 'loggedInUserId' in request.cookies:
@@ -117,6 +128,8 @@ def login():
 			if row is None:
 				return "<h2>No such user exists</h2>"
 			res = make_response(redirect(url_for('userHomepage')))
+
+			## set cookies
 			res.set_cookie('loggedInUserId',row[0])
 			res.set_cookie('loggedInUserName',row[1])
 			res.set_cookie('loggedInUserType',row[3])
@@ -124,16 +137,22 @@ def login():
 
 	return render_template("login.html",pageTitle="login")
 
+## deletes the cookies and logs out
+## redirect to login page
 @app.route('/logout',methods=['POST'])
 def logout():
 	if request.method == 'POST':
 		res = make_response(redirect(url_for('login')))
+		# deleting cookies
 		res.set_cookie('loggedInUserId','',expires=0)
 		res.set_cookie('loggedInUserName','',expires=0)
 		res.set_cookie('loggedInUserType','',expires=0)			
 		return res
 
-
+## used by Registrators,Pharmacist,Diagnostics people
+## accessible only if the user is logged-in
+## if user is logged-in -> redirect to userHomePage
+## if user is not logged-in -> redirect to login page
 @app.route('/user')
 def userHomepage():
 	if 'loggedInUserId' in request.cookies:
@@ -173,7 +192,8 @@ def addNewPatient():
 		return render_template("addnewpatients.html",pageTitle="add new patient")
 	return redirect(url_for('login'))
 
-
+## 404 error handler
+## for custom error pages
 @app.errorhandler(404)
 def pageNotFound(e):
 	return render_template("pageNotFound.html")
