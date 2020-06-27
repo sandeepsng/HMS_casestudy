@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<div>
+		<h2>User Login</h2>
+		<form method="POST" action="/login">
+			Enter User name: <input type="text" name="user_name" pattern="[a-z A-Z0-9]{3,}" placeholder="enter user name" required/><br/><br/>
+			Enter password : <input type="password" name="user_password" pattern=".{3,}" placeholder="enter password" required/> <br/><br/>
+			<input type="submit" name="userLogin_submit_btn" value="login" />
+		</form>
+	</div>
+{% endblock %}
