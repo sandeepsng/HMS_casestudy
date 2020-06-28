@@ -175,6 +175,8 @@ def viewPatientDetails():
 		return render_template("patients.html",patient_details=patient_details,pageTitle="patients details")
 	return redirect(url_for('login'))
 
+## update patient details
+## get the patient "id" from the update form and perform delete operation
 @app.route('/updateDetails', methods=['POST','GET'])
 def update():
 	conn = sqlite3.connect("hospital.db")
@@ -207,17 +209,19 @@ def update():
 		return render_template("updatePatientDetails.html",pageTitle="update patient details",data_set=False)
 	return redirect(url_for('login'))
 
-
+## Delete patient Record, using patient id
+## get patient id and perform delete record 
 @app.route('/delete',methods = ['GET','POST'])
 def deletePatientRecord():
 	conn = sqlite3.connect("hospital.db")
 	cur = conn.cursor()
 	if 'loggedInUserId' in request.cookies:
 		if request.method == 'POST':
-			if request.form['del_pr_confirm_btn']:
+			if request.form['del_pr_confirm_btn'] == 'Delete Record':
 				cur.execute(f"DELETE FROM patients WHERE ws_pat_id={request.form['pat_id']};")
 				conn.commit()
-				print("deleted successfully")
+				return redirect(url_for('deletePatientRecord'))
+			elif request.form['del_pr_confirm_btn'] == 'Close':
 				return redirect(url_for('deletePatientRecord'))
 			
 		if request.method == 'GET':
