@@ -175,6 +175,38 @@ def viewPatientDetails():
 		return render_template("patients.html",patient_details=patient_details,pageTitle="patients details")
 	return redirect(url_for('login'))
 
+@app.route('/updateDetails', methods=['POST','GET'])
+def update():
+	conn = sqlite3.connect("hospital.db")
+	cur = conn.cursor()
+	if 'loggedInUserId' in request.cookies:
+		if request.method == 'POST':
+			p_id = request.form['p_id']
+			p_ssn = request.form['p_ssn']
+			p_name = request.form['p_name']
+			p_age = request.form['p_age']
+			p_addr = request.form['p_addr']
+			p_rtype = request.form['p_rtype']
+			#cur.execute("UPDATE patients SET ws_ssn = ?, ws_pat_name = ?, ws_adrs = ?, ws_age = ?, ws_rtype = ? WHERE ws_pat_id = ?",(request.form['p_ssn'],request.form['p_name']),request.form['p_addr'],request.form['p_age'],request.form['p_rtype'] )
+			cur.execute(f"UPDATE patients SET ws_ssn={p_ssn}, ws_pat_name='{p_name}', ws_age={p_age}, ws_adrs='{p_addr}', ws_rtype='{p_rtype}' WHERE ws_pat_id={p_id};")
+			conn.commit()
+			cur.close()
+			conn.close()
+			return "updated!"			
+
+		if request.method == 'GET':
+			if request.args.get('id'):
+				patient_id = request.args.get('id')
+				
+				cur.execute("SELECT * FROM patients WHERE ws_pat_id=?;",(patient_id,))
+				patient_details = cur.fetchone()
+				cur.close()
+				conn.close()
+				if patient_details is None:
+					return "<h1> no such records found! </h1>"
+				return render_template("updatePatientDetails.html",pageTitle="update patient details",id_editable=False,patient_details=patient_details,data_set=True)
+		return render_template("updatePatientDetails.html",pageTitle="update patient details",data_set=False)
+	return redirect(url_for('login'))
 
 ## if GET request -> returns to the add-new-patient form/html page
 ## if POST request -> user has filled the "add new patient form" -> INSERT the patient details in the "patients" TABLE -> redirect to view all patients details
@@ -197,6 +229,17 @@ def addNewPatient():
 @app.errorhandler(404)
 def pageNotFound(e):
 	return render_template("pageNotFound.html")
+
+@app.route('/pat/<id>')
+def test(id):
+	conn = sqlite3.connect("hospital.db")
+	c = conn.cursor()
+	c.execute("SELECT * FROM patients WHERE ws_pat_id=?;",(id,))
+	d = c.fetchone()
+	print(d)
+	return (f"{d[2]}")
+
+
 
 if __name__ == '__main__':
 	createTable()
