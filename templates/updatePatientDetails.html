@@ -31,10 +31,10 @@
 {% else %}
 <form method="POST" action="/updateDetails">
 	<input type="hidden" value="{{patient_details[1]}}" name="p_id" />
-	Enter SSN : <input type="text" name="p_ssn" pattern="[0-9]{9}" value={{patient_details[0]}} placeholder="enter SSN" required /> <br /><br />
-	Enter Patient Name : <input type="text" name="p_name" value={{patient_details[2]}} pattern="[A-Z a-z]{3,}" placeholder="enter patient name"
+	Enter SSN : <input type="text" name="p_ssn" pattern="[0-9]{9}" value="{{patient_details[0]}}" placeholder="enter SSN" required /> <br /><br />
+	Enter Patient Name : <input type="text" name="p_name" value="{{patient_details[2]}}" pattern="[A-Z a-z]{3,}" placeholder="enter patient name"
 		required /> <br /><br />
-	Enter Patient Age : <input type="number" name="p_age" value={{patient_details[4]}} placeholder="enter patient age" min="1" max="130"
+	Enter Patient Age : <input type="number" name="p_age" value="{{patient_details[4]}}" placeholder="enter patient age" min="1" max="130"
 		style="width: 120px;" required /><br /><br />
 	Enter Home address : <textarea name="p_addr" placeholder="enter address" rows="5" cols="60" required>{{patient_details[3]}}</textarea>
 	<br /><br />
