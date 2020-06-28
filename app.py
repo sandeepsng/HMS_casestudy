@@ -208,6 +208,29 @@ def update():
 	return redirect(url_for('login'))
 
 
+@app.route('/delete',methods = ['GET','POST'])
+def deletePatientRecord():
+	conn = sqlite3.connect("hospital.db")
+	cur = conn.cursor()
+	if 'loggedInUserId' in request.cookies:
+		if request.method == 'POST':
+			if request.form['del_pr_confirm_btn']:
+				cur.execute(f"DELETE FROM patients WHERE ws_pat_id={request.form['pat_id']};")
+				conn.commit()
+				print("deleted successfully")
+				return redirect(url_for('deletePatientRecord'))
+			
+		if request.method == 'GET':
+			if request.args.get('del_patient_submit_btn'):
+				p_id = request.args.get('p_id')
+				cur.execute(f"SELECT * FROM patients WHERE ws_pat_id={p_id};")
+				patient_details = cur.fetchone()
+				if patient_details is None:
+					return "<h1>No such Records Found!</h1>"
+				return render_template("deletePatientRecord.html",pageTitle="delete patient record",patient_details=patient_details,data_set=True)
+		return render_template("deletePatientRecord.html",pageTitle="delete patient record")
+	return redirect(url_for('login'))
+
 		###############################################
 ################ searching for patient deatils using patiendID ####################
 		###############################################

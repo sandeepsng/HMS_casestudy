@@ -5,7 +5,7 @@
 - [x] Create patients DB
      - [x] create new patient
      - [x] update patient record
-     - [ ] delete patient record
+     - [x] delete patient record
      - [x] search patient record
      - [x] view all patient records
      - [ ] billing
