@@ -15,6 +15,7 @@
 - [ ] UI Enhancement
      - [ ] Home Page
      - [ ] Login Page
+     - [ ] Navbar
      - [ ] About-us / Services / motto page
 - [ ] create medicines DB
      - [ ] Get patient Details Screen
