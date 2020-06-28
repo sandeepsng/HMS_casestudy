@@ -3,14 +3,22 @@
 ## TODOs
 - [x] Create users DB
 - [x] Create patients DB
-     - [x] create new patient
-     - [x] update patient record
-     - [x] delete patient record
-     - [x] search patient record
-     - [x] view all patient records
-     - [ ] billing
-- [x] login page
+     - [x] Create Patient Screen
+     - [x] Update Patient Screen
+     - [x] Delete Patient Screen
+     - [x] Search Patient Screen
+     - [x] View Patients Screen
+     - [ ] Patient Billing Screen
+- [x] login page (basic)
 - [x] added authentication
 - [x] cookies
+- [ ] UI Enhancement
+     - [ ] Home Page
+     - [ ] Login Page
+     - [ ] About-us / Services / motto page
 - [ ] create medicines DB
+     - [ ] Get patient Details Screen
+     - [ ] Issue Medicines Screen
 - [ ] create diagnostics DB
+     - [ ] Get patient Details Screen 
+     - [ ] Diagnostics Screen
