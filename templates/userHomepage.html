@@ -5,6 +5,14 @@
 {{cookie_data['loggedInUserName']}}
 {{ request.cookies.get('loggedInUserType') }}
 
+	<ul>
+		<li><a href="{{ url_for('indexPage') }}">Home</a></li>
+		<li><a href="{{ url_for('viewPatientDetails') }}">view all patients</a></li>
+		<li><a href="{{ url_for('addNewPatient') }}">add new patient</a></li>
+		<li><a href="{{ url_for('searching') }}">search for a patient</a></li>
+
+	</ul>
+
 <form action="/logout" method="POST">
 	<input type="submit" value="logout" name="logout_btn" />
 </form>
