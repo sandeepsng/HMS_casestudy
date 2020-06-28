@@ -208,6 +208,47 @@ def update():
 		return render_template("updatePatientDetails.html",pageTitle="update patient details",data_set=False)
 	return redirect(url_for('login'))
 
+
+		###############################################
+################ searching for patient deatils using patiendID ####################
+		###############################################
+
+#for displaying details for the found patient
+def individual(patient):
+	return render_template("patients.html",patient_details=patient,pageTitle="patients mm details")
+
+#for handling cases when no patient with the given Patiend ID is found
+@app.route('/search_for_patient/ERROR')
+def error_in_search():
+	return render_template("searchError.html",pageTitle="No such patient found")
+
+
+#MAIN SEARCH FUNCTION
+@app.route('/search_for_patient',methods=['GET','POST'])
+def searching(): # takes only one input parameter i.e patientId
+	if request.method=="POST":
+		conn_search = sqlite3.connect("hospital.db")
+		c_search=conn_search.cursor()
+		key=(request.form['patientID'],)
+		c_search.execute("Select * FROM patients WHERE ws_pat_id=? ", key)
+		
+		patient=[]
+		for j in c_search.fetchall():
+			patient.append(j)
+		c_search.close()
+		conn_search.close()
+		if len(patient)==0:
+			return redirect(url_for("error_in_search"))
+		else:
+			return individual(patient)
+	
+	return render_template("search_patient.html",pageTitle="Search for a patient")
+
+				     ##############################
+#####################################  Search function ends here  #######################################
+				     ##############################
+
+
 ## if GET request -> returns to the add-new-patient form/html page
 ## if POST request -> user has filled the "add new patient form" -> INSERT the patient details in the "patients" TABLE -> redirect to view all patients details
 @app.route('/addnewpatient',methods=['GET','POST'])
