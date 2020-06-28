@@ -16,7 +16,7 @@
      - [ ] Home Page
      - [ ] Login Page
      - [ ] Navbar
-     - [ ] About-us / Services / motto page
+     - [ ] About-us / Services / motto page (optional)
 - [ ] create medicines DB
      - [ ] Get patient Details Screen
      - [ ] Issue Medicines Screen

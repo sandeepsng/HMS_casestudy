@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block body %}
+{% include "include/navbar.html" %}
 	<form method="POST" action="/search_for_patient">
 		Enter PatientID : <input type="number" name="patientID" pattern="[0-9]{9}" placeholder="enter PatientID" required/> <br/><br/>
 

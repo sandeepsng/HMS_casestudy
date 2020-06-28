@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block body %}
+{% include "include/navbar.html" %}
 <form method="GET">
 	Enter patient id: <input type="text" pattern="[0-9]{9}" name="id" placeholder="enter patient id" {% if data_set %} value="{{patient_details[1]}}" {% endif %} required /> &nbsp;
 	&nbsp;

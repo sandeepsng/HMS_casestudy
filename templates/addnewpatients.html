@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block body %}
+{% include "include/navbar.html" %}
 	<form method="POST" action="/addnewpatient">
 		Enter SSN : <input type="text" name="p_ssn" pattern="[0-9]{9}" placeholder="enter SSN" required/> <br/><br/>
 		Enter Patient Name : <input type="text" name="p_name" pattern="[A-Z a-z]{3,}" placeholder="enter patient name" required/> <br/><br/>
