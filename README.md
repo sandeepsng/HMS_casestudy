@@ -20,9 +20,9 @@
 - [ ] create medicines DB
      - [ ] Get patient Details Screen
      - [ ] Issue Medicines Screen
-- [ ] create diagnostics DB
-     - [ ] Get patient Details Screen 
-     - [ ] Diagnostics Screen
+- [x] create diagnostics DB
+     - [x] Get patient Details Screen 
+     - [x] Diagnostics Screen
 
 ## Login Credentials:
 __`Username:`__ reuser1  
