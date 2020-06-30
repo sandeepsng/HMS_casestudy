@@ -280,7 +280,8 @@ def addNewPatient():
 		if request.method == 'POST':
 			conn = sqlite3.connect("hospital.db")
 			c = conn.cursor()
-			c.execute("INSERT INTO patients (ws_ssn, ws_pat_name, ws_adrs, ws_age, ws_doj, ws_rtype, ws_status) VALUES (?,?,?,?,?,?,?);", (request.form['p_ssn'],request.form['p_name'],request.form['p_addr'],request.form['p_age'],getCurrentDate(),request.form['p_rtype'],1))
+			address = request.form['p_addr'] + ", " + request.form['p_state']
+			c.execute("INSERT INTO patients (ws_ssn, ws_pat_name, ws_adrs, ws_age, ws_doj, ws_rtype, ws_status) VALUES (?,?,?,?,?,?,?);", (request.form['p_ssn'],request.form['p_name'],address,request.form['p_age'],getCurrentDate(),request.form['p_rtype'],1))
 			conn.commit()
 			c.close()
 			conn.close()
