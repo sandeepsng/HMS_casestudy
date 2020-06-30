@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<body>
+{% include "include/navbar.html" %}
+<h1>Add Diagnostic Test to patient with patient ID {{key[2:11]}}</h1>
+
+<p>Select the test to add to patient's profile.</p>
+
+<form method="POST" action="/searchTest/<{{key}}>">
+
+  <label for="Tests">Choose a Test:</label>
+  <select name="Tests" id="test">
+    <option value="Blood">Blood</option>
+    <option value="Stool">Stool</option>
+    <option value="Mucus">Mucus</option>
+    <option value="Blood pressure">Blood pressure</option>
+
+    <option value="CT scan">CT scan</option>
+    <option value="Ultrasound">Ultrasound</option>
+    <option value="Biopsy">Biopsy</option>
+    <option value="Breathing rate">Breathing rate</option>
+
+    <option value="X ray">X ray</option>
+    <option value="Endoscopy">Endoscopy</option>
+
+  </select>
+  <br><br>
+  <input type="submit" value="Submit">
+</form>
+
+</body>
+</html>

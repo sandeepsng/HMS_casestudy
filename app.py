@@ -289,6 +289,71 @@ def addNewPatient():
 		return render_template("addnewpatients.html",pageTitle="add new patient")
 	return redirect(url_for('login'))
 
+########################################### DIAGNOSTIC SECTION  ###################################
+										#		STARTS  		#
+#########################################  DIAGNOSTIC SECTION  ############################################
+
+@app.route('/update_test/<patientID>/<test_ID>',methods=['GET','POST'])
+def update_test(patientID,test_ID):
+	conn_pat=sqlite3.connect("diagnostics.db")
+	c_pat=conn_pat.cursor()
+
+	# "track_diagnostics" is the table for tracking which patient has taken which tests
+	c_pat.execute("INSERT INTO track_diagnostics (Patient_ID,test_ID) VALUES (?,?);", (patientID,test_ID))
+	conn_pat.commit()
+	c_pat.close()
+	conn_pat.close()
+	
+	return render_template("base.html",function="update")
+
+
+#main diagnostics screen for searching diagnosis test by name
+@app.route('/searchTest/<key>',methods=['GET','POST'])
+def search_test(key):
+	if request.method=="POST":
+		conn_pat=sqlite3.connect("hospital.db")
+		c_pat=conn_pat.cursor()
+		a=[str(s) for s in key.split(",")]
+		b=a[0]
+		actual_int=int(b[3:12])
+		actual_key=(str(actual_int),)
+		c_pat.execute("Select * FROM patients WHERE ws_pat_id=? ", actual_key)
+
+		patient=[]
+		for i in c_pat.fetchall():
+			patient.append(i)
+		c_pat.close()
+		conn_pat.close()
+
+		if len(patient)==0:
+			return redirect(url_for("error_in_search"))
+
+		conn_search = sqlite3.connect("diagnostics.db")
+		c_search=conn_search.cursor()
+		name=(request.form['Tests'],)
+
+		#  "Diagnostics_master" is the table which store testID, names and charges of test to be conducted
+		c_search.execute("Select * FROM Diagnostics_master WHERE Test_Name=? ", name)
+		
+		test_details=[]
+		for j in c_search.fetchall():
+			test_details.append(j)
+		c_search.close()
+		conn_search.close()
+		if len(test_details)==0:
+			return redirect(url_for("error_in_search"))
+		else:
+			return render_template("add_test.html", test_details=test_details, patient_detail=patient, pageTitle="test details")
+	
+	return render_template("search_test.html",key=key)
+
+
+
+										   #############################
+###########################################  DIAGNOSTIC SECTION ENDS HERE #####################
+										   ##############################
+
+
 ## 404 error handler
 ## for custom error pages
 @app.errorhandler(404)
