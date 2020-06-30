@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<form method="POST" action="/searchTest/<{{key}}>">
+
+		<h1>Patients Details</h1>
+		<table border="1">
+			<tr>
+				<td><b>SSN</b></td>
+				<td><b>patient id</b></td>
+				<td><b>patient name</b></td>
+				<td><b>home address</b></td>
+				<td><b>age</b></td>
+				<td><b>admitted on</b></td>
+				<td><b>room type</b></td>
+				<td><b>status</b></td>
+			</tr>
+		{% for patient in patient_detail %}
+			<tr>
+			{% for i in patient %}
+				<td>{{ i }} </td>
+			{% endfor %}
+			</tr>
+		{% endfor %}
+		</table>
+
+
+
+
+
+		<h1>Test Details</h1>
+		<table border="1">
+			<tr>
+				<td><b>Test_ID</b></td>
+				<td><b>Test_Name</b></td>
+				<td><b>charges</b></td>
+			</tr>
+		{% for each in test_details %}
+			<tr>
+			{% for i in each %}
+				<td>{{ i }} </td>
+			{% endfor %}
+			</tr>
+		{% endfor %}
+		</table>
+		<br>
+
+		<a href="{{ url_for('userHomepage') }}" class="button">Back to home</a><br>
+		<br>
+		<a href="{{ url_for('update_test', patientID=patient_detail[0][1], test_ID=test_details[0][0]) }}" class="button">Update</a><br>
+
+
+	</form>
+
+{% endblock %}

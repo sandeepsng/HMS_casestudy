@@ -22,4 +22,14 @@
 		</tr>
 	{% endfor %}
 	</table>
+	{% if function =="search"%}
+		<br>
+
+		<a href="{{ url_for('indexPage') }}" class="button">Add Medicine</a><br>
+		<br>
+
+		<a href="{{ url_for('search_test', key=key) }}" class="button">Add Diagnostics</a>
+
+	{% endif %}
+
 {% endblock %}
