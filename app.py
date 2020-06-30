@@ -235,15 +235,9 @@ def deletePatientRecord():
 		return render_template("deletePatientRecord.html",pageTitle="delete patient record")
 	return redirect(url_for('login'))
 
-
-
 		###############################################
-################ searching for patient deatils using patientID ####################
+################ searching for patient deatils using patiendID ####################
 		###############################################
-
-#for displaying details for the found patient
-def individual(patient,key):
-	return render_template("patients.html",function="search",key=key,patient_details=patient,pageTitle="patients mm details")
 
 #for handling cases when no patient with the given Patiend ID is found
 @app.route('/search_for_patient/ERROR')
@@ -254,98 +248,29 @@ def error_in_search():
 #MAIN SEARCH FUNCTION
 @app.route('/search_for_patient',methods=['GET','POST'])
 def searching(): # takes only one input parameter i.e patientId
-	if request.method=="POST":
-		conn_search = sqlite3.connect("hospital.db")
-		c_search=conn_search.cursor()
-		key=(request.form['patientID'],)
-		c_search.execute("Select * FROM patients WHERE ws_pat_id=? ", key)
-		
-		patient=[]
-		for j in c_search.fetchall():
-			patient.append(j)
-		c_search.close()
-		conn_search.close()
-		if len(patient)==0:
-			return redirect(url_for("error_in_search"))
-		else:
-
-			return individual(patient,key)
-	
-	return render_template("search_patient.html",pageTitle="Search for a patient")
+	if 'loggedInUserId' in request.cookies:
+		if request.method=="POST":
+			conn_search = sqlite3.connect("hospital.db")
+			c_search=conn_search.cursor()
+			key=(request.form['patientID'],)
+			c_search.execute("Select * FROM patients WHERE ws_pat_id=? ", key)
+			
+			patient=[]
+			for j in c_search.fetchall():
+				patient.append(j)
+			c_search.close()
+			conn_search.close()
+			if len(patient)==0:
+				return redirect(url_for("error_in_search"))
+			else:
+				return render_template("patients.html",patient_details=patient,pageTitle="patients details")
+		return render_template("search_patient.html",pageTitle="Search for a patient")
+	return redirect(url_for('login'))
 
 				     ##############################
 #####################################  Search function ends here  #######################################
 				     ##############################
 
-
-
-
-########################################### DIAGNOSTIC SECTION  ###################################
-										#		STARTS  		#
-#########################################  DIAGNOSTIC SECTION  ############################################
-
-@app.route('/update_test/<patientID>/<test_ID>',methods=['GET','POST'])
-def update_test(patientID,test_ID):
-	conn_pat=sqlite3.connect("diagnostics.db")
-	c_pat=conn_pat.cursor()
-
-	# "track_diagnostics" is the table for tracking which patient has taken which tests
-	c_pat.execute("INSERT INTO track_diagnostics (Patient_ID,test_ID) VALUES (?,?);", (patientID,test_ID))
-	conn_pat.commit()
-	c_pat.close()
-	conn_pat.close()
-	
-	return render_template("base.html",function="update")
-
-
-#main diagnostics screen for searching diagnosis test by name
-@app.route('/searchTest/<key>',methods=['GET','POST'])
-def search_test(key):
-	if request.method=="POST":
-		conn_pat=sqlite3.connect("hospital.db")
-		c_pat=conn_pat.cursor()
-		a=[str(s) for s in key.split(",")]
-		b=a[0]
-		actual_int=int(b[3:12])
-		actual_key=(str(actual_int),)
-		c_pat.execute("Select * FROM patients WHERE ws_pat_id=? ", actual_key)
-
-		patient=[]
-		for i in c_pat.fetchall():
-			patient.append(i)
-		c_pat.close()
-		conn_pat.close()
-
-		if len(patient)==0:
-			return redirect(url_for("error_in_search"))
-
-
-
-
-		conn_search = sqlite3.connect("diagnostics.db")
-		c_search=conn_search.cursor()
-		name=(request.form['Tests'],)
-
-		#  "Diagnostics_master" is the table which store testID, names and charges of test to be conducted
-		c_search.execute("Select * FROM Diagnostics_master WHERE Test_Name=? ", name)
-		
-		test_details=[]
-		for j in c_search.fetchall():
-			test_details.append(j)
-		c_search.close()
-		conn_search.close()
-		if len(test_details)==0:
-			return redirect(url_for("error_in_search"))
-		else:
-			return render_template("add_test.html", test_details=test_details, patient_detail=patient, pageTitle="test details")
-	
-	return render_template("search_test.html",key=key)
-
-
-
-										   #############################
-###########################################  DIAGNOSTIC SECTION ENDS HERE #####################
-										   ##############################
 
 ## if GET request -> returns to the add-new-patient form/html page
 ## if POST request -> user has filled the "add new patient form" -> INSERT the patient details in the "patients" TABLE -> redirect to view all patients details
