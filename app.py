@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, url_for, redirect, make_response
+from flask import Flask, render_template, request, url_for, redirect, make_response, flash
 import sqlite3
 import datetime
 import os
 import hashlib   # used to hash passwords | SHA256
 
 app = Flask(__name__)
+app.secret_key = "abc"
 
 conn = sqlite3.connect('hospital.db')
 cur = conn.cursor()
@@ -126,7 +127,8 @@ def login():
 			c.execute("SELECT * from users WHERE name = ? and password = ? ;", (user_name,hashed_user_password))
 			row = c.fetchone()
 			if row is None:
-				return "<h2>No such user exists</h2>"
+				flash("Invalid Credentials! Please check your username or password")
+				return redirect(url_for('login'))		
 			res = make_response(redirect(url_for('userHomepage')))
 
 			## set cookies
@@ -193,7 +195,8 @@ def update():
 			conn.commit()
 			cur.close()
 			conn.close()
-			return "updated!"			
+			flash("Patient Details updated successfully!")
+			return redirect(url_for('update'))		
 
 		if request.method == 'GET':
 			if request.args.get('id'):
@@ -204,7 +207,8 @@ def update():
 				cur.close()
 				conn.close()
 				if patient_details is None:
-					return "<h1> no such records found! </h1>"
+					flash("No such patient exists!")
+					return redirect(url_for('update'))
 				return render_template("updatePatientDetails.html",pageTitle="update patient details",id_editable=False,patient_details=patient_details,data_set=True)
 		return render_template("updatePatientDetails.html",pageTitle="update patient details",data_set=False)
 	return redirect(url_for('login'))
@@ -220,6 +224,7 @@ def deletePatientRecord():
 			if request.form['del_pr_confirm_btn'] == 'Delete Record':
 				cur.execute(f"DELETE FROM patients WHERE ws_pat_id={request.form['pat_id']};")
 				conn.commit()
+				flash("Patient Details Deleted successfully!")
 				return redirect(url_for('deletePatientRecord'))
 			elif request.form['del_pr_confirm_btn'] == 'Close':
 				return redirect(url_for('deletePatientRecord'))
@@ -230,7 +235,8 @@ def deletePatientRecord():
 				cur.execute(f"SELECT * FROM patients WHERE ws_pat_id={p_id};")
 				patient_details = cur.fetchone()
 				if patient_details is None:
-					return "<h1>No such Records Found!</h1>"
+					flash("No such Patient exists!")
+					return redirect(url_for('deletePatientRecord'))
 				return render_template("deletePatientRecord.html",pageTitle="delete patient record",patient_details=patient_details,data_set=True)
 		return render_template("deletePatientRecord.html",pageTitle="delete patient record")
 	return redirect(url_for('login'))
@@ -238,12 +244,6 @@ def deletePatientRecord():
 		###############################################
 ################ searching for patient deatils using patiendID ####################
 		###############################################
-
-#for handling cases when no patient with the given Patiend ID is found
-@app.route('/search_for_patient/ERROR')
-def error_in_search():
-	return render_template("searchError.html",pageTitle="No such patient found")
-
 
 #MAIN SEARCH FUNCTION
 @app.route('/search_for_patient',methods=['GET','POST'])
@@ -261,7 +261,8 @@ def searching(): # takes only one input parameter i.e patientId
 			c_search.close()
 			conn_search.close()
 			if len(patient)==0:
-				return redirect(url_for("error_in_search"))
+				flash("No such Patient found!")
+				return redirect(url_for('searching'))
 			else:
 				return render_template("patients.html",patient_details=patient,pageTitle="patients details")
 		return render_template("search_patient.html",pageTitle="Search for a patient")
@@ -281,11 +282,17 @@ def addNewPatient():
 			conn = sqlite3.connect("hospital.db")
 			c = conn.cursor()
 			address = request.form['p_addr'] + ", " + request.form['p_state']
-			c.execute("INSERT INTO patients (ws_ssn, ws_pat_name, ws_adrs, ws_age, ws_doj, ws_rtype, ws_status) VALUES (?,?,?,?,?,?,?);", (request.form['p_ssn'],request.form['p_name'],address,request.form['p_age'],getCurrentDate(),request.form['p_rtype'],1))
-			conn.commit()
-			c.close()
-			conn.close()
-			return redirect(url_for('viewPatientDetails'))	
+			try:
+				c.execute("INSERT INTO patients (ws_ssn, ws_pat_name, ws_adrs, ws_age, ws_doj, ws_rtype, ws_status) VALUES (?,?,?,?,?,?,?);", (request.form['p_ssn'],request.form['p_name'],address,request.form['p_age'],getCurrentDate(),request.form['p_rtype'],1))
+				conn.commit()
+				c.close()
+				conn.close()
+				flash("Patient Record uploaded successfully!")
+				return redirect(url_for('addNewPatient'))
+			except:
+				flash("An error occured!")
+				return redirect(url_for('addNewPatient'))
+			#return redirect(url_for('viewPatientDetails'))	
 		return render_template("addnewpatients.html",pageTitle="add new patient")
 	return redirect(url_for('login'))
 

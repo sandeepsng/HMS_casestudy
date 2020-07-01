@@ -1,7 +1,33 @@
 {% extends "base.html" %}
 
 {% block body %}
-{% include "include/navbar.html" %}
+	{% include "include/navbar.html" %}
+
+	{% with messages = get_flashed_messages() %}
+		{% if messages %}
+			{% for message in messages %}
+				{% if message == 'An error occured!' %}
+					<div class="alert alert-danger alert-dismissable" id="flash-message-box-error" role="alert"
+						style="width: 90%;margin:auto">
+						<b>{{message}}</b>
+						<button type="button" data-dismiss="alert" class="close" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+				{% else %}
+					<div class="alert alert-success alert-dismissable" id="flash-message-box" role="alert"
+						style="width: 90%;margin:auto">
+						<b>{{message}}</b>
+						<button type="button" data-dismiss="alert" class="close" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
+
+	<h1>Add New Patient</h1>
 	<form method="POST" action="/addnewpatient">
 		Enter SSN : <input type="text" name="p_ssn" pattern="[0-9]{9}" placeholder="enter SSN" required/> <br/><br/>
 		Enter Patient Name : <input type="text" name="p_name" pattern="[A-Z a-z]{3,}" placeholder="enter patient name" required/> <br/><br/>
@@ -58,5 +84,11 @@
 		<br><br>
 		<input type="submit" value="add patient record" />
 	</form>
+{% endblock %}
+{% block scripts %}
+	<script src="{{ url_for('static',filename='closeFlashMessage.js') }}"></script>
+	<script>
+		window.addEventListener("load",closeFlashMessage);
+	</script>
 {% endblock %}
 

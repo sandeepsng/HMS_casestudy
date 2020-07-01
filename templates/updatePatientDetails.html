@@ -2,6 +2,30 @@
 
 {% block body %}
 {% include "include/navbar.html" %}
+{% with messages = get_flashed_messages() %}
+		{% if messages %}
+			{% for message in messages %}
+				{% if message == 'No such patient exists!' %}
+					<div class="alert alert-danger alert-dismissable" id="flash-message-box-error" role="alert"
+						style="width: 90%;margin:auto">
+						<b>{{message}}</b>
+						<button type="button" data-dismiss="alert" class="close" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+				{% else %}
+					<div class="alert alert-success alert-dismissable" id="flash-message-box" role="alert"
+						style="width: 90%;margin:auto">
+						<b>{{message}}</b>
+						<button type="button" data-dismiss="alert" class="close" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
+<h1>Update Patient Record</h1>
 <form method="GET">
 	Enter patient id: <input type="text" pattern="[0-9]{9}" name="id" placeholder="enter patient id" {% if data_set %} value="{{patient_details[1]}}" {% endif %} required /> &nbsp;
 	&nbsp;
@@ -63,4 +87,10 @@
 </form>
 
 {% endif %}
+{% endblock %}
+{% block scripts %}
+	<script src="{{ url_for('static',filename='closeFlashMessage.js') }}"></script>
+	<script>
+		window.addEventListener("load",closeFlashMessage);
+	</script>
 {% endblock %}
