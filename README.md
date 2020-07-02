@@ -14,8 +14,8 @@
 - [x] cookies
 - [ ] UI Enhancement
      - [ ] Home Page
-     - [ ] Login Page
-     - [ ] Navbar
+     - [x] Login Page
+     - [x] Navbar
      - [ ] About-us / Services / motto page (optional)
 - [ ] create medicines DB
      - [ ] Get patient Details Screen
