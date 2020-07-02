@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block body %}
+{% include "include/navbar.html" %}
+	<h1>Patient histroy Details</h1>
+	<table border="1">
+		<tr>
+			<td><b>Patient ID</b></td>
+			<td><b>patient name</b></td>
+			<td><b>age</b></td>
+			<td><b>home address</b></td>
+			<td><b>admitted on</b></td>
+			<td><b>Medicine name</b></td>
+			<td><b> quantity issued</b></td>
+			<td><b>rate</b></td>
+			<td><b>Amount</b></td>
+		</tr>
+	{%
+		 for patient in patient_details %}
+		<tr>
+		{% for i in patient %}
+			<td>{{ i }} </td>
+		{% endfor %}
+		</tr>
+	{% endfor %}
+    </table>
+    
+	<form method="POST" action="/issueMedicines">
+		<!--<input type="hidden"  name="pId" value="{{var}}"> -->
+		<input type="submit" value="issueMedicines">
+	</form>
+{% endblock %}
