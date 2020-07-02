@@ -29,23 +29,33 @@
 		</tr>
 	{% endfor %}
 	</table>
-	</div>
-</div>	
 
-	<h1>Diagnostics Details of patient</h1>
-	<table border="1">
-		<tr>
-			<td><b>Patient_iD</b></td>
-			<td><b>Test_ID</b></td>
-		</tr>
-	{% for each_test in test_details %}
-		<tr>
-		{% for i in each_test %}
-			<td>{{ i }} </td>
+
+
+	{% if test_details!=[]%}
+		<h1>Diagnostics Details of patient</h1>
+		<table border="1">
+			<tr>
+				<td><b>Patient_iD</b></td>
+				<td><b>Test_ID</b></td>
+			</tr>
+		{% for each_test in test_details %}
+			<tr>
+			{% for i in each_test %}
+				<td>{{ i }} </td>
+			{% endfor %}
+			</tr>
+
 		{% endfor %}
-		</tr>
-	{% endfor %}
-	</table>
+		</table>
+	{% endif %}
+
+	{% if test_details==[]%}
+		<h1>Diagnostics Details of patient</h1>
+		<h3>No Diagnostics tests taken till date </h3>
+	{% endif %}
+		
+
 
 
 	{% if function =="search"%}
