@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block body %}
+{% include "include/navbar.html" %}
+{% with messages = get_flashed_messages() %}
+		{% if messages %}
+			{% for message in messages %}
+				{% if message == 'No such Patient exists!' %}
+					<div class="alert alert-danger alert-dismissable" id="flash-message-box-error" role="alert"
+						style="width: 90%;margin:auto">
+						<b>{{message}}</b>
+						<button type="button" data-dismiss="alert" class="close" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+				{% else %}
+					<div class="alert alert-success alert-dismissable" id="flash-message-box" role="alert"
+						style="width: 90%;margin:auto">
+						<b>{{message}}</b>
+						<button type="button" data-dismiss="alert" class="close" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
+<h1>Delete Patient Record</h1>
+<div>
+	<form method="GET" action="/delete">
+		Enter patient ID: <input type="text" pattern="[0-9]{9}" name="p_id" placeholder="Enter patient id" required/> &nbsp;&nbsp;
+		<input type="submit" name="del_patient_submit_btn" value="Show Details" /> &nbsp;&nbsp;
+		<input type="reset" value="Clear">
+	</form>
+</div>
+
+{% if data_set %}
+<hr/>
+	<div>
+		<h3>Patient Details</h3>
+		<table border="1">
+			<tr>
+				<td><b>SSN</b></td>
+				<td><b>patient id</b></td>
+				<td><b>patient name</b></td>
+				<td><b>home address</b></td>
+				<td><b>age</b></td>
+				<td><b>admitted on</b></td>
+				<td><b>room type</b></td>
+				<td><b>status</b></td>
+			</tr>
+			<tr>
+			{% for details in patient_details %}
+				<td> {{details}} </td>
+				
+			{% endfor %}
+			</tr>
+		</table>
+		<br/><br/>
+		<form method="POST" action="/delete">
+			<input type="hidden" name="pat_id" value="{{patient_details[1]}}" />
+			<input type="submit" class="btn btn-danger" name="del_pr_confirm_btn" value="Delete Record" /> &nbsp;
+			<input type="submit" name="del_pr_confirm_btn" value="Close" /> 
+		</form>
+
+	</div>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+	<script src="{{ url_for('static',filename='closeFlashMessage.js') }}"></script>
+	<script>
+		window.addEventListener("load",closeFlashMessage);
+	</script>
+{% endblock %}

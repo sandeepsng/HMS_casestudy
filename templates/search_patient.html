@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block body %}
+{% include "include/navbar.html" %}
+{% with messages = get_flashed_messages() %}
+		{% if messages %}
+			{% for message in messages %}
+					<div class="alert alert-danger alert-dismissable" id="flash-message-box" role="alert"
+						style="width: 90%;margin:auto">
+						<b>{{message}}</b>
+						<button type="button" data-dismiss="alert" class="close" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
+	<form method="POST" action="/search_for_patient">
+		Enter PatientID : <input type="number" name="patientID" pattern="[0-9]{9}" min="100000000" placeholder="enter PatientID" required/> <br/><br/>
+
+		<input type="submit" value="search" />
+	</form>
+{% endblock %}
