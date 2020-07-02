@@ -245,6 +245,16 @@ def deletePatientRecord():
 ################ searching for patient deatils using patiendID ####################
 		###############################################
 
+#for displaying details for the found patient
+def individual(patient,key,tests):
+	return render_template("patients.html",function="search",key=key,patient_details=patient,test_details=tests,pageTitle="patients mm details")
+
+#for handling cases when no patient with the given Patiend ID is found
+@app.route('/search_for_patient/ERROR')
+def error_in_search():
+	return render_template("searchError.html",pageTitle="No such patient found")
+
+
 #MAIN SEARCH FUNCTION
 @app.route('/search_for_patient',methods=['GET','POST'])
 def searching(): # takes only one input parameter i.e patientId
@@ -260,11 +270,24 @@ def searching(): # takes only one input parameter i.e patientId
 				patient.append(j)
 			c_search.close()
 			conn_search.close()
+
 			if len(patient)==0:
 				flash("No such Patient found!")
 				return redirect(url_for('searching'))
 			else:
-				return render_template("patients.html",patient_details=patient,pageTitle="patients details")
+				test_search = sqlite3.connect("diagnostics.db")
+				d_search=test_search.cursor()
+				d_search.execute("Select * FROM track_diagnostics WHERE Patient_ID=? ", key)
+				
+				tests=[]
+				for k in d_search.fetchall():
+					tests.append(k)
+					
+				d_search.close()
+				test_search.close()
+
+
+				return individual(patient,key,tests)
 		return render_template("search_patient.html",pageTitle="Search for a patient")
 	return redirect(url_for('login'))
 
@@ -335,6 +358,39 @@ def search_test(key):
 		if len(patient)==0:
 			return redirect(url_for("error_in_search"))
 
+		###########################for displaying alredy taken tests ################
+		test_search = sqlite3.connect("diagnostics.db")
+		d_search=test_search.cursor()
+		d_search.execute("Select Test_ID FROM track_diagnostics WHERE Patient_ID=? ", actual_key)
+				
+		already_taken_tests_ID=[]
+		for k in d_search.fetchall():
+			already_taken_tests_ID.append(k)
+					
+		d_search.close()
+		test_search.close()
+
+		
+		#####geting price detailsof testsconducted already
+
+		already_test_search = sqlite3.connect("diagnostics.db")
+		dp_search=already_test_search.cursor()
+
+		already_taken_tests_details=[]
+		for each in already_taken_tests_ID:
+			dp_search.execute("Select * FROM Diagnostics_master WHERE Test_ID=? ", each)
+			for k in dp_search.fetchall():
+				already_taken_tests_details.append(k)
+					
+		dp_search.close()
+		already_test_search.close()
+
+
+
+
+
+		#############################################################################
+
 		conn_search = sqlite3.connect("diagnostics.db")
 		c_search=conn_search.cursor()
 		name=(request.form['Tests'],)
@@ -350,7 +406,7 @@ def search_test(key):
 		if len(test_details)==0:
 			return redirect(url_for("error_in_search"))
 		else:
-			return render_template("add_test.html", test_details=test_details, patient_detail=patient, pageTitle="test details")
+			return render_template("add_test.html", test_details=test_details,already=already_taken_tests_details, patient_detail=patient, pageTitle="test details")
 	
 	return render_template("search_test.html",key=key)
 

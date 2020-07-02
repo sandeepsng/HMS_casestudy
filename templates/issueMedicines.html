@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+<meta charset="UTF-8">
+{% block body %}
+	<div>
+
+		<h2>User Login</h2>
+		<form method="POST" id="checkavail" action="">
+			Enter medicine: <input type="text" id ="medicine_name" name="medicine_name" pattern="[a-z A-Z0-9]{3,}" placeholder="enter medicine" required/><br/><br/>
+			Enter quantity : <input type="number" name="medicine_password" pattern=".{3,}" placeholder="enter quantity" required/> <br/><br/>
+			<input type="submit" name="issue_submit_btn" value="issue" />
+		</form>
+    </div>
+{% endblock %}
