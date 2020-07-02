@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block body %}
+	<form method="POST" action="/searchMedicine/<{{key}}>">
+
+		<h1>Patients Details</h1>
+		<table border="1">
+			<tr>
+				<td><b>SSN</b></td>
+				<td><b>patient id</b></td>
+				<td><b>patient name</b></td>
+				<td><b>home address</b></td>
+				<td><b>age</b></td>
+				<td><b>admitted on</b></td>
+				<td><b>room type</b></td>
+				<td><b>status</b></td>
+			</tr>
+		{% for patient in patient_detail %}
+			<tr>
+			{% for i in patient %}
+				<td>{{ i }} </td>
+			{% endfor %}
+			</tr>
+		{% endfor %}
+		</table>
+	
+		{% if already!=[]%}
+			<h1>Already taken Medicine Details</h1>
+			<table border="1">
+				<tr>
+					<td><b>Medicine_Id</b></td>
+					<td><b>Medicine_name</b></td>
+                    <td><b>Quantity_issued</b></td>
+                    <td><b>Price per unit</b></td>
+				</tr>
+			{% for each in already %}
+				<tr>
+				{% for i in each %}
+					<td>{{ i }} </td>
+				{% endfor %}
+				</tr>
+			{% endfor %}
+			</table>
+			<br>
+			<br>
+			<br>
+		{% endif %}
+
+		{% if already==[]%}
+			<h1>Pharmacy Details of patient</h1>
+			<h3>No Medicines issued till date !<h3>
+			<br>
+			<br>
+		{% endif %}
+
+
+
+		<h1>New Medicine Details to be added</h1>
+		<table border="1">
+			<tr>
+				<td><b>Medicine_ID</b></td>
+				<td><b>Medicine_Name</b></td>
+				<td><b>Quantity Issued</b></td>
+                <td><b>Price</b></td>
+			</tr>
+		{% for each in test_details %}
+			<tr>
+			{% for i in each %}
+				<td>{{ i }} </td>
+			{% endfor %}
+			</tr>
+		{% endfor %}
+		</table>
+		<br>
+
+		<a href="{{ url_for('userHomepage') }}" class="button">Back to home</a><br>
+		<br>
+		<a href="{{ url_for('update_medicine', patientID=patient_detail[0][1], test_ID=test_details[0][0],issuedquant=issuedquant, new_quantity=new_quantity) }}" class="button">Update</a><br>
+
+
+	</form>
+
+{% endblock %}
