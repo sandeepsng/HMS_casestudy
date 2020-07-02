@@ -8,7 +8,7 @@
      - [x] Delete Patient Screen
      - [x] Search Patient Screen
      - [x] View Patients Screen
-     - [ ] Patient Billing Screen
+     - [x] Patient Billing Screen
 - [x] login page (basic)
 - [x] added authentication
 - [x] cookies
