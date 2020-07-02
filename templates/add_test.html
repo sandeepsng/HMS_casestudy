@@ -24,27 +24,37 @@
 		{% endfor %}
 		</table>
 	
-
-		<h1>Already taken Test Details</h1>
-		<table border="1">
-			<tr>
-				<td><b>Test_ID</b></td>
-				<td><b>Test_Name</b></td>
-				<td><b>charges</b></td>
-			</tr>
-		{% for each in already %}
-			<tr>
-			{% for i in each %}
-				<td>{{ i }} </td>
+		{% if already!=[]%}
+			<h1>Already taken Test Details</h1>
+			<table border="1">
+				<tr>
+					<td><b>Test_ID</b></td>
+					<td><b>Test_Name</b></td>
+					<td><b>charges</b></td>
+				</tr>
+			{% for each in already %}
+				<tr>
+				{% for i in each %}
+					<td>{{ i }} </td>
+				{% endfor %}
+				</tr>
 			{% endfor %}
-			</tr>
-		{% endfor %}
-		</table>
-		<br>
+			</table>
+			<br>
+			<br>
+			<br>
+		{% endif %}
+
+		{% if already==[]%}
+			<h1>Diagnostics Details of patient</h1>
+			<h3>No Diagnostic tests taken till date !<h3>
+			<br>
+			<br>
+		{% endif %}
 
 
 
-		<h1>New to be added Test Details</h1>
+		<h1>New Test Details to be added</h1>
 		<table border="1">
 			<tr>
 				<td><b>Test_ID</b></td>
