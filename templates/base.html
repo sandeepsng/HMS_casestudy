@@ -33,9 +33,11 @@
 	<div class="container">
 		{% block body %}
 		{% if function=="update" %}
-			<h1>Diagnostics added successfully</h1>
+			<h1>Diagnostics/Medicine added successfully</h1>
 
 			<a href="{{ url_for('searching') }}" class="button">Add more tests</a><br>
+			<br>
+			<a href="{{ url_for('searching') }}" class="button">Add more medicines</a><br>
 			<br>
 			<a href="{{ url_for('userHomepage') }}" class="button">Go to Homepage</a><br>
 

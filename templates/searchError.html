@@ -5,7 +5,14 @@
 </head>
 <body>
 	<h1>Sorry!</h1>
-    <h3>No such patient found</h3>
 
+	{% if value=="quantity" %}
+		<h3>Quantity exceeded the available quantity (available={{quant}})</h3>
+
+
+	{% endif %}
+	{% if value!="quantity" %}
+    	<h3>No such patient found</h3>
+	{% endif %}
 </body>
 </html>

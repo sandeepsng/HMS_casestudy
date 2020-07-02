@@ -261,9 +261,9 @@ def individual(patient,key,tests):
 	return render_template("patients.html",function="search",key=key,patient_details=patient,test_details=tests,pageTitle="patients mm details")
 
 #for handling cases when no patient with the given Patiend ID is found
-@app.route('/search_for_patient/ERROR')
-def error_in_search():
-	return render_template("searchError.html",pageTitle="No such patient found")
+@app.route('/search_for_patient/ERROR/<value>/<quant>')
+def error_in_search(value,quant):
+	return render_template("searchError.html",value=value,quant=quant,pageTitle="No such patient found")
 
 
 #MAIN SEARCH FUNCTION
@@ -344,6 +344,10 @@ def addNewPatient():
 			#return redirect(url_for('viewPatientDetails'))	
 		return render_template("addnewpatients.html",pageTitle="add new patient")
 	return redirect(url_for('login'))
+
+
+
+
 
 ########################################### DIAGNOSTIC SECTION  ###################################
 										#		STARTS  		#
@@ -441,6 +445,129 @@ def search_test(key):
 										   #############################
 ###########################################  DIAGNOSTIC SECTION ENDS HERE #####################
 										   ##############################
+
+########################################### PHARMACY SECTION  ###################################
+										#		STARTS  		#
+#########################################  PHARMACY SECTION  ############################################
+
+
+@app.route('/update_test/<patientID>/<test_ID>/<issuedquant><new_quantity>',methods=['GET','POST'])
+def update_medicine(patientID,test_ID,issuedquant,new_quantity):
+	conn_pat=sqlite3.connect("pharmacy.db")
+	c_pat=conn_pat.cursor()
+
+	# "track_diagnostics" is the table for tracking which patient has taken which tests
+	c_pat.execute("INSERT INTO track_medicine (Patient_ID, Medicine_ID, quantity_issued) VALUES (?,?,?);", (patientID,test_ID,issuedquant))
+	conn_pat.commit()
+	c_pat.close()
+	conn_pat.close()
+
+	############## Updating availble quantity in medicine_master table  #########
+
+	co_pat=sqlite3.connect("pharmacy.db")
+	cat=co_pat.cursor()
+
+	# "track_diagnostics" is the table for tracking which patient has taken which tests
+
+	cat.execute(f"UPDATE medicine_master SET Quantity_available={new_quantity} WHERE Medicine_ID={test_ID};")
+	co_pat.commit()
+	cat.close()
+	co_pat.close()
+	
+	
+	return render_template("base.html",function="update")
+
+
+
+@app.route('/searchMedicine/<key>',methods=['GET','POST'])
+def search_medicine(key):
+	if request.method=="POST":
+		conn_pat=sqlite3.connect("hospital.db")
+		c_pat=conn_pat.cursor()
+		a=[str(s) for s in key.split(",")]
+		b=a[0]
+		actual_int=int(b[3:12])
+		actual_key=(str(actual_int),)
+		c_pat.execute("Select * FROM patients WHERE ws_pat_id=? ", actual_key)
+
+		patient=[]
+		for i in c_pat.fetchall():
+			patient.append(i)
+		c_pat.close()
+		conn_pat.close()
+
+		if len(patient)==0:
+			return redirect(url_for("error_in_search"))
+
+		###########################for displaying alredy taken tests ################
+		test_search = sqlite3.connect("pharmacy.db")
+		d_search=test_search.cursor()
+		d_search.execute("Select Medicine_ID FROM track_medicine WHERE Patient_ID=? ", actual_key)
+				
+		already_medicine_taken_ID=[]
+		for k in d_search.fetchall():
+			already_medicine_taken_ID.append(k)
+					
+		d_search.close()
+		test_search.close()
+
+		
+		#####geting price detailsof testsconducted already
+
+		already_test_search = sqlite3.connect("pharmacy.db")
+		dp_search=already_test_search.cursor()
+
+		already_taken_medicine_details=[]
+		for each in already_medicine_taken_ID:
+			dp_search.execute("Select * FROM medicine_master WHERE Medicine_ID=? ", each)
+			for k in dp_search.fetchall():
+				already_taken_medicine_details.append(k)
+					
+		dp_search.close()
+		already_test_search.close()
+
+#############################################################################
+############  CHECKING AVAILABILITY    #################
+
+		
+		
+		
+		quantity_required=int(request.form['quantity_issued'])
+		
+		
+		
+		
+		comsearch = sqlite3.connect("pharmacy.db")
+		c_search=comsearch.cursor()
+		name=(request.form['Medicine'],)
+
+	
+		#  "Diagnostics_master" is the table which store testID, names and charges of test to be conducted
+		c_search.execute("Select * FROM medicine_master WHERE Medicine_name=? ", name)
+		
+		test_details=[]
+		for j in c_search.fetchall():
+			test_details.append(j)
+			quantity_available=int(j[2])
+
+		list_req=[list(test_details[0])]
+		list_req[0][2]=quantity_required
+		c_search.close()
+		comsearch.close()
+		if quantity_available<quantity_required:
+			return redirect(url_for("error_in_search",value="quantity",quant=quantity_available))
+		else:
+			new_quantity=quantity_available-quantity_required
+			return render_template("add_medicine.html", test_details=list_req,already=already_taken_medicine_details, patient_detail=patient,issuedquant=quantity_required,new_quantity=new_quantity, pageTitle="Medicine details")
+	
+	return render_template("search_medicine.html",key=key)
+
+
+
+
+
+
+
 
 
 @app.route('/billing',methods=['GET','POST'])
