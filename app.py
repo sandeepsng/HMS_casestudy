@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request, url_for, redirect, make_response, flash
+from flask import Flask, render_template, request, url_for, redirect, make_response,session,sessions,jsonify
 import sqlite3
 import datetime
 import os
 import hashlib   # used to hash passwords | SHA256
 
 app = Flask(__name__)
-app.secret_key = "abc"
+app.secret_key = "super secret key"
 
 conn = sqlite3.connect('hospital.db')
 cur = conn.cursor()
@@ -127,8 +127,7 @@ def login():
 			c.execute("SELECT * from users WHERE name = ? and password = ? ;", (user_name,hashed_user_password))
 			row = c.fetchone()
 			if row is None:
-				flash("Invalid Credentials! Please check your username or password")
-				return redirect(url_for('login'))		
+				return "<h2>No such user exists</h2>"
 			res = make_response(redirect(url_for('userHomepage')))
 
 			## set cookies
@@ -177,6 +176,8 @@ def viewPatientDetails():
 		return render_template("patients.html",patient_details=patient_details,pageTitle="patients details")
 	return redirect(url_for('login'))
 
+
+
 ## update patient details
 ## get the patient "id" from the update form and perform delete operation
 @app.route('/updateDetails', methods=['POST','GET'])
@@ -195,8 +196,7 @@ def update():
 			conn.commit()
 			cur.close()
 			conn.close()
-			flash("Patient Details updated successfully!")
-			return redirect(url_for('update'))		
+			return "updated!"			
 
 		if request.method == 'GET':
 			if request.args.get('id'):
@@ -207,8 +207,7 @@ def update():
 				cur.close()
 				conn.close()
 				if patient_details is None:
-					flash("No such patient exists!")
-					return redirect(url_for('update'))
+					return "<h1> no such records found! </h1>"
 				return render_template("updatePatientDetails.html",pageTitle="update patient details",id_editable=False,patient_details=patient_details,data_set=True)
 		return render_template("updatePatientDetails.html",pageTitle="update patient details",data_set=False)
 	return redirect(url_for('login'))
@@ -224,7 +223,6 @@ def deletePatientRecord():
 			if request.form['del_pr_confirm_btn'] == 'Delete Record':
 				cur.execute(f"DELETE FROM patients WHERE ws_pat_id={request.form['pat_id']};")
 				conn.commit()
-				flash("Patient Details Deleted successfully!")
 				return redirect(url_for('deletePatientRecord'))
 			elif request.form['del_pr_confirm_btn'] == 'Close':
 				return redirect(url_for('deletePatientRecord'))
@@ -235,8 +233,7 @@ def deletePatientRecord():
 				cur.execute(f"SELECT * FROM patients WHERE ws_pat_id={p_id};")
 				patient_details = cur.fetchone()
 				if patient_details is None:
-					flash("No such Patient exists!")
-					return redirect(url_for('deletePatientRecord'))
+					return "<h1>No such Records Found!</h1>"
 				return render_template("deletePatientRecord.html",pageTitle="delete patient record",patient_details=patient_details,data_set=True)
 		return render_template("deletePatientRecord.html",pageTitle="delete patient record")
 	return redirect(url_for('login'))
@@ -244,6 +241,12 @@ def deletePatientRecord():
 		###############################################
 ################ searching for patient deatils using patiendID ####################
 		###############################################
+
+#for handling cases when no patient with the given Patiend ID is found
+@app.route('/search_for_patient/ERROR')
+def error_in_search():
+	return render_template("searchError.html",pageTitle="No such patient found")
+
 
 #MAIN SEARCH FUNCTION
 @app.route('/search_for_patient',methods=['GET','POST'])
@@ -261,17 +264,56 @@ def searching(): # takes only one input parameter i.e patientId
 			c_search.close()
 			conn_search.close()
 			if len(patient)==0:
-				flash("No such Patient found!")
-				return redirect(url_for('searching'))
+				return redirect(url_for("error_in_search"))
 			else:
 				return render_template("patients.html",patient_details=patient,pageTitle="patients details")
 		return render_template("search_patient.html",pageTitle="Search for a patient")
 	return redirect(url_for('login'))
 
+
 				     ##############################
 #####################################  Search function ends here  #######################################
 				     ##############################
 
+		###############################################
+################  GET patient histroy deatils using patiendID ####################
+		###############################################
+@app.route('/getPatientDetails',methods=['GET','POST'])
+def getPatientDetails(): # takes only one input parameter i.e patientId
+	if 'loggedInUserId' in request.cookies:
+		if request.method=="POST":
+			conn_details = sqlite3.connect("hospital.db")
+			c_details=conn_details.cursor()
+			key=(request.form['patientID'],)
+			c_details.execute("Select b.ws_pat_id,b.ws_pat_name,b.ws_age,b.ws_adrs,b.ws_doj,a.ws_med_name,a.ws_qty,c.Rate,a.ws_qty*c.Rate FROM medicines a INNER JOIN patients b ON a.ws_pat_id=b.ws_pat_id INNER JOIN MasterMedicines c ON a.ws_med_name=c.ws_med_name  WHERE a.ws_pat_id=? ", key)
+			
+			patient=[]
+			
+			
+			for j in c_details.fetchall():
+				patient.append(j)
+			c_details.close()
+			conn_details.close()
+			
+			if len(patient)==0:
+				return redirect(url_for("error_in_search"))
+			else:
+				pid=patient[0]
+				session['my_var'] = pid
+				#print(pid)
+				return render_template("patientHistrtoy.html",patient_details=patient,pageTitle="patient Histroy details")
+		return render_template("getPatientDetails.html",pageTitle="Get paients details")
+	return redirect(url_for('login'))
+
+
+		###############################################
+################  GET  deatils  ENDS HERE ####################
+		###############################################
+@app.route('/issueMedicines',methods=['GET','POST'])
+def issueMedicines():
+	my_var = session.get('my_var', None)
+	my_var2=my_var[0]	
+	return render_template("issueMedicines.html",pageTitle="issueMedicines")
 
 ## if GET request -> returns to the add-new-patient form/html page
 ## if POST request -> user has filled the "add new patient form" -> INSERT the patient details in the "patients" TABLE -> redirect to view all patients details
@@ -281,85 +323,13 @@ def addNewPatient():
 		if request.method == 'POST':
 			conn = sqlite3.connect("hospital.db")
 			c = conn.cursor()
-			address = request.form['p_addr'] + ", " + request.form['p_state']
-			try:
-				c.execute("INSERT INTO patients (ws_ssn, ws_pat_name, ws_adrs, ws_age, ws_doj, ws_rtype, ws_status) VALUES (?,?,?,?,?,?,?);", (request.form['p_ssn'],request.form['p_name'],address,request.form['p_age'],getCurrentDate(),request.form['p_rtype'],1))
-				conn.commit()
-				c.close()
-				conn.close()
-				flash("Patient Record uploaded successfully!")
-				return redirect(url_for('addNewPatient'))
-			except:
-				flash("An error occured!")
-				return redirect(url_for('addNewPatient'))
-			#return redirect(url_for('viewPatientDetails'))	
+			c.execute("INSERT INTO patients (ws_ssn, ws_pat_name, ws_adrs, ws_age, ws_doj, ws_rtype, ws_status) VALUES (?,?,?,?,?,?,?);", (request.form['p_ssn'],request.form['p_name'],request.form['p_addr'],request.form['p_age'],getCurrentDate(),request.form['p_rtype'],1))
+			conn.commit()
+			c.close()
+			conn.close()
+			return redirect(url_for('viewPatientDetails'))	
 		return render_template("addnewpatients.html",pageTitle="add new patient")
 	return redirect(url_for('login'))
-
-########################################### DIAGNOSTIC SECTION  ###################################
-										#		STARTS  		#
-#########################################  DIAGNOSTIC SECTION  ############################################
-
-@app.route('/update_test/<patientID>/<test_ID>',methods=['GET','POST'])
-def update_test(patientID,test_ID):
-	conn_pat=sqlite3.connect("diagnostics.db")
-	c_pat=conn_pat.cursor()
-
-	# "track_diagnostics" is the table for tracking which patient has taken which tests
-	c_pat.execute("INSERT INTO track_diagnostics (Patient_ID,test_ID) VALUES (?,?);", (patientID,test_ID))
-	conn_pat.commit()
-	c_pat.close()
-	conn_pat.close()
-	
-	return render_template("base.html",function="update")
-
-
-#main diagnostics screen for searching diagnosis test by name
-@app.route('/searchTest/<key>',methods=['GET','POST'])
-def search_test(key):
-	if request.method=="POST":
-		conn_pat=sqlite3.connect("hospital.db")
-		c_pat=conn_pat.cursor()
-		a=[str(s) for s in key.split(",")]
-		b=a[0]
-		actual_int=int(b[3:12])
-		actual_key=(str(actual_int),)
-		c_pat.execute("Select * FROM patients WHERE ws_pat_id=? ", actual_key)
-
-		patient=[]
-		for i in c_pat.fetchall():
-			patient.append(i)
-		c_pat.close()
-		conn_pat.close()
-
-		if len(patient)==0:
-			return redirect(url_for("error_in_search"))
-
-		conn_search = sqlite3.connect("diagnostics.db")
-		c_search=conn_search.cursor()
-		name=(request.form['Tests'],)
-
-		#  "Diagnostics_master" is the table which store testID, names and charges of test to be conducted
-		c_search.execute("Select * FROM Diagnostics_master WHERE Test_Name=? ", name)
-		
-		test_details=[]
-		for j in c_search.fetchall():
-			test_details.append(j)
-		c_search.close()
-		conn_search.close()
-		if len(test_details)==0:
-			return redirect(url_for("error_in_search"))
-		else:
-			return render_template("add_test.html", test_details=test_details, patient_detail=patient, pageTitle="test details")
-	
-	return render_template("search_test.html",key=key)
-
-
-
-										   #############################
-###########################################  DIAGNOSTIC SECTION ENDS HERE #####################
-										   ##############################
-
 
 ## 404 error handler
 ## for custom error pages
