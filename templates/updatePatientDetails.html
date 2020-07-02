@@ -25,65 +25,95 @@
 			{% endfor %}
 		{% endif %}
 	{% endwith %}
-<h1>Update Patient Record</h1>
+	<br>
+	<div class="page-header">
+		<h1>Update Patient Record</h1>      
+	</div>
+	<br>
 <form method="GET">
-	Enter patient id: <input type="text" pattern="[0-9]{9}" name="id" placeholder="enter patient id" {% if data_set %} value="{{patient_details[1]}}" {% endif %} required /> &nbsp;
-	&nbsp;
-	<input type="submit" name="up_patient_id_sunbmit_btn" value="GET Details" />
+	<div class="form-group">
+		<label>Enter patient id: </label>
+		<input type="text" class="form-control" pattern="[0-9]{9}" name="id" placeholder="enter patient id" {% if data_set %} value="{{patient_details[1]}}" {% endif %} required /> 
+	</div>
+	<input type="submit" class="btn btn-primary" name="up_patient_id_sunbmit_btn" value="GET Details" />
 
 
 </form>
 <hr />
 {% if not data_set %}
 <form method="POST" action="">
-	Enter SSN : <input type="text" name="p_ssn" pattern="[0-9]{9}" placeholder="enter SSN" required /> <br /><br />
-	Enter Patient Name : <input type="text" name="p_name" pattern="[A-Z a-z]{3,}" placeholder="enter patient name"
-		required /> <br /><br />
-	Enter Patient Age : <input type="number" name="p_age" placeholder="enter patient age" min="1" max="130"
-		style="width: 120px;" required /><br /><br />
-	Enter Home address : <textarea name="p_addr" placeholder="enter address" rows="5" cols="60" required></textarea>
-	<br /><br />
-	Select Room Type:
-	<select name="p_rtype" required>
-		<option value="" selected>Select</option>
-		<option value="General">General</option>
-		<option value="Semi">Semi</option>
-		<option value="Single">Single</option>
-	</select>
-	<br><br>
-	<input type="submit" value="add patient record" />
+	<div class="form-group">
+		<label>Enter SSN : </label>
+		<input type="text" class="form-control" name="p_ssn" pattern="[0-9]{9}" placeholder="enter SSN" required />
+	</div>
+	<div class="form-group">
+		<label>Enter Patient Name : </label>
+		<input type="text" class="form-control" name="p_name" pattern="[A-Z a-z]{3,}" placeholder="enter patient name"
+		required />
+	</div>
+	<div class="form-group">
+		<label>Enter Patient Age : </label>
+		<input type="number" class="form-control" name="p_age" placeholder="enter patient age" min="1" max="130"
+		style="width: 120px;" required />	</div>
+	<div class="form-group">
+		<label>Enter Home address : </label>
+		<textarea name="p_addr" class="form-control" placeholder="enter address" rows="5" cols="60" required></textarea>
+	</div>
+
+	<div class="form-group">
+		<label>Select Room Type:</label>
+		<select name="p_rtype" class="form-control" required>
+			<option value="" selected>Select</option>
+			<option value="General">General</option>
+			<option value="Semi">Semi</option>
+			<option value="Single">Single</option>
+		</select>	
+	</div>
+	<input type="submit" class="btn btn-primary" value="add patient record" />
 </form>
 {% else %}
 <form method="POST" action="/updateDetails">
 	<input type="hidden" value="{{patient_details[1]}}" name="p_id" />
-	Enter SSN : <input type="text" name="p_ssn" pattern="[0-9]{9}" value="{{patient_details[0]}}" placeholder="enter SSN" required /> <br /><br />
-	Enter Patient Name : <input type="text" name="p_name" value="{{patient_details[2]}}" pattern="[A-Z a-z]{3,}" placeholder="enter patient name"
-		required /> <br /><br />
-	Enter Patient Age : <input type="number" name="p_age" value="{{patient_details[4]}}" placeholder="enter patient age" min="1" max="130"
-		style="width: 120px;" required /><br /><br />
-	Enter Home address : <textarea name="p_addr" placeholder="enter address" rows="5" cols="60" required>{{patient_details[3]}}</textarea>
-	<br /><br />
-	Select Room Type:
-	<select name="p_rtype" required>
-		<option value="">Select</option>
-		{% if patient_details[6] == 'General' %}
-			<option value="General" selected>General</option>
-		{% else %}
-			<option value="General">General</option>
-		{% endif %}
-		{% if patient_details[6] == 'Semi' %}
-			<option value="Semi" selected>Semi</option>
-		{% else %}
-			<option value="Semi">Semi</option>
-		{% endif %}
-		{% if patient_details[6] == 'Single' %}
-			<option value="Single" selected>Single</option>
-		{% else %}
-			<option value="Single">Single</option>
-		{% endif %}
-	</select>
-	<br><br>
-	<input type="submit" value="add patient record" />
+	<div class="form-group">
+		<label>Enter SSN : </label>
+		<input type="text" class="form-control" name="p_ssn" pattern="[0-9]{9}" value="{{patient_details[0]}}" placeholder="enter SSN" required />
+	</div>
+	<div class="form-group">
+		<label>Enter Patient Name : </label>
+		<input type="text" class="form-control" name="p_name" value="{{patient_details[2]}}" pattern="[A-Z a-z]{3,}" placeholder="enter patient name"
+		required />
+	</div>
+	<div class="form-group">
+		<label>Enter Patient Age : </label>
+		<input type="number" class="form-control"  name="p_age" value="{{patient_details[4]}}" placeholder="enter patient age" min="1" max="130"
+		style="width: 120px;" required />
+	</div>
+	<div class="form-group">
+		<label>Enter Home address : </label>
+		<textarea name="p_addr" class="form-control"  placeholder="enter address" rows="5" cols="60" required>{{patient_details[3]}}</textarea>
+	</div>
+	<div class="form-group">
+		<label>	Select Room Type: </label>
+		<select name="p_rtype" class="form-control" required>
+			<option value="">Select</option>
+			{% if patient_details[6] == 'General' %}
+				<option value="General" selected>General</option>
+			{% else %}
+				<option value="General">General</option>
+			{% endif %}
+			{% if patient_details[6] == 'Semi' %}
+				<option value="Semi" selected>Semi</option>
+			{% else %}
+				<option value="Semi">Semi</option>
+			{% endif %}
+			{% if patient_details[6] == 'Single' %}
+				<option value="Single" selected>Single</option>
+			{% else %}
+				<option value="Single">Single</option>
+			{% endif %}
+		</select>
+	</div>
+	<input type="submit" class="btn btn-secondary" value="add patient record" />
 </form>
 
 {% endif %}
