@@ -15,9 +15,16 @@
 			{% endfor %}
 		{% endif %}
 	{% endwith %}
+	<br>
+	<div class="page-header">
+		<h1>Search for a Patient</h1>      
+	</div>
+	<br>
 	<form method="POST" action="/search_for_patient">
-		Enter PatientID : <input type="number" name="patientID" pattern="[0-9]{9}" min="100000000" placeholder="enter PatientID" required/> <br/><br/>
-
-		<input type="submit" value="search" />
+		<div class="form-group">
+			<label>Enter PatientID : </label>
+			<input type="number" class="form-control" name="patientID" pattern="[0-9]{9}" min="100000000" placeholder="enter PatientID" required/>
+		</div>
+		<input type="submit" class="btn btn-primary" value="search" />
 	</form>
 {% endblock %}
