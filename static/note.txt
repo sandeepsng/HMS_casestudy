@@ -1,1 +1,0 @@
-add all static files here eg. images, css, js scripts, etc..
