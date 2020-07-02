@@ -94,7 +94,18 @@ def viewUsers():
 	c.close()
 	cur.close()
 
+## calculates room rent
+## general : Rs. 2000
+## single : Rs. 8000
+## Semi : Rs. 4000
+def getTotalRoomRent(room_type:str,days:int):
+	if room_type == 'General':
+		return 2000 * days
+	elif room_type == 'Single':
+		return 8000 * days
+	return 4000 * days
 
+	
 ## ========================================================================
 ## =========== FLASK ROUTES and LOGIC BELOW ===============================
 ## ========================================================================
@@ -430,6 +441,70 @@ def search_test(key):
 										   #############################
 ###########################################  DIAGNOSTIC SECTION ENDS HERE #####################
 										   ##############################
+
+
+@app.route('/billing',methods=['GET','POST'])
+def billing():
+	GRAND_TOTAL = 0
+	if 'loggedInUserId' in request.cookies:
+		if request.method == 'POST':
+			if request.form['bill_btn'] == 'Close':
+				return redirect(url_for('billing'))
+			if request.form['bill_btn'] == 'Confirm':
+				return render_template("thankYouPage.html",pageTitle="Thank You")
+		if request.method == 'GET':
+			if request.args.get('bill_btn_submit') == "GET Details":
+				patient_id = request.args.get("p_id")
+				conn = sqlite3.connect("hospital.db")
+				c = conn.cursor()
+
+				conn2 = sqlite3.connect("pharmacy.db")
+				c2 = conn2.cursor()
+				c.execute(f"SELECT * FROM patients WHERE ws_pat_id={patient_id}")
+				patient_details = c.fetchone()
+				if patient_details is None:
+					flash("No such Patient Exists!")
+					return redirect(url_for('billing'))
+				
+				c2.execute(f'''
+						SELECT track_medicine.Medicine_ID, medicine_master.Medicine_name , medicine_master.Price_per_unit, track_medicine.quantity_issued, medicine_master.Price_per_unit * track_medicine.quantity_issued as Amount
+						FROM track_medicine INNER JOIN medicine_master
+						ON track_medicine.Medicine_ID = medicine_master.Medicine_ID
+						WHERE track_medicine.Patient_ID={patient_id}''')
+				pharmacy_details = c2.fetchall()
+				pharmacy_set = True if len(pharmacy_details) !=0 else False
+				print(pharmacy_set)
+				pharmacy_total = 0
+				if pharmacy_set:
+					for pharma in pharmacy_details:
+						pharmacy_total += pharma[4]
+				
+				conn3 = sqlite3.connect("diagnostics.db")
+				c3 = conn3.cursor()
+				c3.execute(f'''
+						SELECT Diagnostics_master.Test_ID, Diagnostics_master.Test_Name, Diagnostics_master.charges 
+						FROM Diagnostics_master INNER JOIN track_diagnostics 
+						ON Diagnostics_master.Test_ID = track_diagnostics.test_ID
+						WHERE track_diagnostics.Patient_ID = {patient_id}''')
+				diag_details = c3.fetchall()
+				diag_set = True if len(diag_details) !=0 else False
+				diag_total = 0
+				if diag_set:
+					for d in diag_details:
+						diag_total += d[2]
+				
+				date_format = "%Y-%m-%d"
+				today_date = getCurrentDate()
+				doj = datetime.datetime.strptime(patient_details[5],date_format)
+				toc = datetime.datetime.strptime(today_date,date_format)
+				delta = toc - doj
+				room_rent_days_count = delta.days
+				room_cost = getTotalRoomRent(patient_details[6],room_rent_days_count)
+				GRAND_TOTAL = room_cost + pharmacy_total + diag_total
+
+				return render_template("bill.html",pageTitle="billing", data_set=True, patient_details=patient_details,pharmacy_set=pharmacy_set,pharmacy_details=pharmacy_details,pharmacy_total=pharmacy_total,diag_set=diag_set,diag_details=diag_details,diag_total=diag_total,today_date=today_date,room_rent_days_count=room_rent_days_count,room_cost=room_cost,grand_total=GRAND_TOTAL)
+		return render_template("bill.html",pageTitle="billing")
+	return redirect(url_for('login'))
 
 
 ## 404 error handler

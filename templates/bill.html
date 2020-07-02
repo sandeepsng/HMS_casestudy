@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block body %}
+	<div class="main-block">
+		<header>
+			<h1 style="text-align: center;">Patient Billing</h1>
+		</header>
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+				{% for message in messages %}
+						<div class="alert alert-danger alert-dismissable" id="flash-message-box" role="alert"
+							style="width: 90%;margin:auto">
+							<b>{{message}}</b>
+							<button type="button" data-dismiss="alert" class="close" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+				{% endfor %}
+			{% endif %}
+		{% endwith %}
+		<div class="get-form">
+			<form method="GET" action="/billing">
+				Enter patient ID: 
+				<input type="text" class="form form-control" pattern="[0-9]{9}" placeholder="Enter patient id" name="p_id" style="width: 55%;" required/><br/>
+				<input type="submit" name="bill_btn_submit" class="btn btn-primary" value="GET Details"  />
+			</form>
+		</div>
+
+
+
+		{% if data_set %}
+			<hr/>
+			<header>
+				<h2>Patient Details</h2>
+			</header>
+			<table class="table table-striped" border="1">
+				<tr>
+					<td><b>SSN</b></td>
+					<td><b>Patient ID</b></td>
+					<td><b>Patient Name</b></td>
+					<td><b>Home Address</b></td>
+					<td><b>Age</b></td>
+					<td><b>Admitted on</b></td>
+					<td><b>Room Type</b></td>
+					<td><b>Status</b></td>
+				</tr>
+				<tr>
+				{% for i in patient_details %}
+					<td>{{ i }}</td>
+				{% endfor %}
+			</table>
+
+			<!-- Room rent here -->
+			<h2 style="margin-top: 45px;">Room Charges</h2>
+			<hr/>
+			<div>
+				<b>Room Type :</b>
+				{{ patient_details[6] }}<br/>
+				<b>Date of Admission :</b> {{ patient_details[5] }} <br/>
+				<b>Date of Discharge :</b> {{ today_date }} <br/>
+				<b>No. of Days :</b> {{room_rent_days_count}}<br/><br/>
+				<b style="float: right;">Total Room Charges: Rs. {{ room_cost }} </b>				
+			</div>
+
+			<!-- Room rent ENDs here -->
+
+			<h2 style="margin-top: 45px;">Pharmacy Charges</h2>
+			<hr/>
+			{% if pharmacy_set %}
+				<table class="table table-striped" border="1" >
+					<tr>
+						<td><b>Medicine ID</b></td>
+						<td><b>Medicine Name</b></td>
+						<td><b>Price Per Unit</b></td>
+						<td><b>Quantity Issued</b></td>
+						<td><b>Amount</b></td>
+					</tr>
+					{% for pharma in pharmacy_details %}
+						<tr>
+							{% for i in pharma %}
+								<td>{{ i }}</td>
+							{% endfor %}
+						</tr>
+					{% endfor %}
+				</table>
+				<b style="float: right;">Bill for Pharmacy: Rs. {{ pharmacy_total }} </b>
+			
+			{% else %}
+				<p>No Pharmacy Issues / Records found!</p>
+			{% endif %}
+			<!--pharmacy_set ends here-->
+
+			<h2 style="margin-top: 45px;">Diagnosis Charges</h2>
+			<hr/>
+			{% if diag_set %}
+			<table class="table table-striped" border="1">
+				<tr>
+					<td><b>Test ID</b></td>
+					<td><b>Test Name</b></td>
+					<td><b>Cost</b></td>
+				</tr>
+				{% for diag in diag_details %}
+					<tr>
+						{% for i in diag %}
+							<td>{{ i }}</td>
+						{% endfor %}
+					</tr>
+				{% endfor %}
+			</table>
+			<b style="float: right;">Bill for Diagnosis: Rs. {{ diag_total }} </b>
+			{% else %}
+				<p>No Diagnosis records found!</p>
+			{% endif %}
+			<!--diag_set ends here-->
+
+			<div style="margin-top: 75px;">
+				<hr/>
+				<h3 style="text-align: right;"><span style="color: red;">GRAND TOTAL</span>: Rs. {{ grand_total }}  </h3>
+			</div>
+			<div class="text-center" style="margin-top: 65px;margin-bottom:60px;">
+				<form method="POST" action="/billing">
+					<input type="submit" name="bill_btn" value="Confirm" class="btn btn-success"/>&nbsp;
+					<input type="submit" name="bill_btn" value="Close" class="btn btn-danger"/>
+				</form>
+			</div>
+			
+		{% endif %}
+		
+
+	</div>
+{% endblock %}
