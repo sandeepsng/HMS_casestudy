@@ -277,14 +277,29 @@ def searching(): # takes only one input parameter i.e patientId
 			else:
 				test_search = sqlite3.connect("diagnostics.db")
 				d_search=test_search.cursor()
-				d_search.execute("Select * FROM track_diagnostics WHERE Patient_ID=? ", key)
-				
-				tests=[]
+				d_search.execute("Select Test_ID FROM track_diagnostics WHERE Patient_ID=? ", key)
+						
+				already_taken_tests_ID=[]
 				for k in d_search.fetchall():
-					tests.append(k)
-					
+					already_taken_tests_ID.append(k)
+							
 				d_search.close()
 				test_search.close()
+
+				
+				#####geting price detailsof testsconducted already
+
+				already_test_search = sqlite3.connect("diagnostics.db")
+				dp_search=already_test_search.cursor()
+
+				tests=[]
+				for each in already_taken_tests_ID:
+					dp_search.execute("Select * FROM Diagnostics_master WHERE Test_ID=? ", each)
+					for k in dp_search.fetchall():
+						tests.append(k)
+							
+				dp_search.close()
+				already_test_search.close()
 
 
 				return individual(patient,key,tests)
