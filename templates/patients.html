@@ -1,18 +1,25 @@
 {% extends "base.html" %}
 
 {% block body %}
-{% include "include/navbar.html" %}
-	<h1>Patients Details</h1>
-	<table border="1">
+{% include "nav.html" %}
+
+<div class="container">
+	<br>
+	<div class="page-header">
+		<h1>Patients Details</h1>      
+	</div>
+	<br>
+	<div class="container">
+	<table class="table table-striped" border="1">
 		<tr>
 			<td><b>SSN</b></td>
-			<td><b>patient id</b></td>
-			<td><b>patient name</b></td>
-			<td><b>home address</b></td>
-			<td><b>age</b></td>
-			<td><b>admitted on</b></td>
-			<td><b>room type</b></td>
-			<td><b>status</b></td>
+			<td><b>Patient ID</b></td>
+			<td><b>Patient Name</b></td>
+			<td><b>Home Address</b></td>
+			<td><b>Age</b></td>
+			<td><b>Admitted on</b></td>
+			<td><b>Room Type</b></td>
+			<td><b>Status</b></td>
 		</tr>
 	{% for patient in patient_details %}
 		<tr>
@@ -22,8 +29,8 @@
 		</tr>
 	{% endfor %}
 	</table>
-
-
+	</div>
+</div>	
 
 	<h1>Diagnostics Details of patient</h1>
 	<table border="1">
@@ -50,4 +57,5 @@
 		<a href="{{ url_for('search_test', key=key) }}" class="button">Add Diagnostics</a>
 
 	{% endif %}
+
 {% endblock %}
