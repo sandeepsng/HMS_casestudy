@@ -22,4 +22,32 @@
 		</tr>
 	{% endfor %}
 	</table>
+
+
+
+	<h1>Diagnostics Details of patient</h1>
+	<table border="1">
+		<tr>
+			<td><b>Patient_iD</b></td>
+			<td><b>Test_ID</b></td>
+		</tr>
+	{% for each_test in test_details %}
+		<tr>
+		{% for i in each_test %}
+			<td>{{ i }} </td>
+		{% endfor %}
+		</tr>
+	{% endfor %}
+	</table>
+
+
+	{% if function =="search"%}
+		<br>
+
+		<a href="{{ url_for('indexPage') }}" class="button">Add Medicine</a><br>
+		<br>
+
+		<a href="{{ url_for('search_test', key=key) }}" class="button">Add Diagnostics</a>
+
+	{% endif %}
 {% endblock %}
