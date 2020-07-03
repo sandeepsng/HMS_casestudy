@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<body>
+{% include "include/navbar.html" %}
+<h1>Issue medicine to patient with patient ID {{key[2:11]}}</h1>
+
+<p>Select the medicine to add to patient's profile.</p>
+
+<form method="POST" action="/searchMedicine/<{{key}}>">
+
+  <label for="Medicine">Choose a Medicine:</label>
+  <select name="Medicine" id="medicine">
+  	<option value="meftle forte">meftle forte</option>
+    <option value="vicks">vicks</option>
+    <option value="zintec">zintec</option>
+    <option value="coronil">coronil</option>
+
+    <option value="esprin">esprin</option>
+    <option value="ofloxacin">ofloxacin</option>
+    <option value="paracetamol">paracetamol</option>
+  
+  <br>
+
+  Enter Quantity to be Issued : <input type="number" name="quantity_issued" placeholder="Enter quantity" min=1 max=130 style="width: 150px;" required/><br/><br/>   
+  </select>
+  <br><br>
+  <input type="submit" value="Submit">
+</form>
+
+</body>
+</html>
