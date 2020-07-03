@@ -16,13 +16,13 @@
 		{% endif %}
 	{% endwith %}
 
-	<h2>User Login</h2>
-	<form method="POST" action="/login">
-		Enter User name: <input type="text" name="user_name" pattern="[a-z A-Z0-9]{3,}" placeholder="enter user name"
+	<form method="POST" class="text-center border border-light p-5" action="/login">
+		<p class="h4 mb-4">Login</p>
+		<input type="text" name="user_name" pattern="[a-z A-Z0-9]{3,}" class="form-control" placeholder="enter user name"
 			required /><br /><br />
-		Enter password : <input type="password" name="user_password" pattern=".{3,}" placeholder="enter password"
+		<input type="password" name="user_password" pattern=".{3,}" class="form-control" placeholder="enter password"
 			required /> <br /><br />
-		<input type="submit" name="userLogin_submit_btn" value="login" />
+		<input type="submit" class="btn btn-info btn-block my-4" name="userLogin_submit_btn" value="login" />
 	</form>
 </div>
 {% endblock %}
