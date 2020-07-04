@@ -257,8 +257,8 @@ def deletePatientRecord():
 		###############################################
 
 #for displaying details for the found patient
-def individual(patient,key,tests):
-	return render_template("patients.html",function="search",key=key,patient_details=patient,test_details=tests,pageTitle="patients mm details")
+def individual(patient,key):
+	return render_template("patients.html",function="search",key=key,patient_details=patient,pageTitle="Details of required patient:")
 
 #for handling cases when no patient with the given Patiend ID is found
 @app.route('/search_for_patient/ERROR/<value>/<quant>')
@@ -300,20 +300,20 @@ def searching(): # takes only one input parameter i.e patientId
 				
 				#####geting price detailsof testsconducted already
 
-				already_test_search = sqlite3.connect("diagnostics.db")
-				dp_search=already_test_search.cursor()
+				# already_test_search = sqlite3.connect("diagnostics.db")
+				# dp_search=already_test_search.cursor()
 
-				tests=[]
-				for each in already_taken_tests_ID:
-					dp_search.execute("Select * FROM Diagnostics_master WHERE Test_ID=? ", each)
-					for k in dp_search.fetchall():
-						tests.append(k)
+				# tests=[]
+				# for each in already_taken_tests_ID:
+				# 	dp_search.execute("Select * FROM Diagnostics_master WHERE Test_ID=? ", each)
+				# 	for k in dp_search.fetchall():
+				# 		tests.append(k)
 							
-				dp_search.close()
-				already_test_search.close()
+				# dp_search.close()
+				# already_test_search.close()
 
 
-				return individual(patient,key,tests)
+				return individual(patient,key)
 		return render_template("search_patient.html",pageTitle="Search for a patient")
 	return redirect(url_for('login'))
 
@@ -451,31 +451,51 @@ def search_test(key):
 #########################################  PHARMACY SECTION  ############################################
 
 
-@app.route('/update_test/<patientID>/<test_ID>/<issuedquant><new_quantity>',methods=['GET','POST'])
-def update_medicine(patientID,test_ID,issuedquant,new_quantity):
+@app.route('/update_test/<patientID>/<medicine_ID>/<issuedquant>/<new_quantity>')
+def update_medicine(patientID,medicine_ID,issuedquant,new_quantity):
+	
+
 	conn_pat=sqlite3.connect("pharmacy.db")
 	c_pat=conn_pat.cursor()
 
+
 	# "track_diagnostics" is the table for tracking which patient has taken which tests
-	c_pat.execute("INSERT INTO track_medicine (Patient_ID, Medicine_ID, quantity_issued) VALUES (?,?,?);", (patientID,test_ID,issuedquant))
+	c_pat.execute("INSERT INTO track_medicine (Patient_ID, Medicine_ID, quantity_issued) VALUES (?,?,?);", (patientID,medicine_ID,issuedquant))
 	conn_pat.commit()
 	c_pat.close()
 	conn_pat.close()
 
 	############## Updating availble quantity in medicine_master table  #########
-
+	# new_quantity=int(new_quantity)
 	co_pat=sqlite3.connect("pharmacy.db")
 	cat=co_pat.cursor()
 
-	# "track_diagnostics" is the table for tracking which patient has taken which tests
+	# "track_medicine" is the table for tracking which patient has taken which medicine
 
-	cat.execute(f"UPDATE medicine_master SET Quantity_available={new_quantity} WHERE Medicine_ID={test_ID};")
+	cat.execute(f"UPDATE medicine_master SET Quantity_available={new_quantity} WHERE Medicine_ID={medicine_ID};")
 	co_pat.commit()
 	cat.close()
 	co_pat.close()
 	
 	
 	return render_template("base.html",function="update")
+
+
+def create_issued_med(already_taken_medicine_details,quantities):
+	new_arr=[]
+
+	count=0
+	for every in already_taken_medicine_details:
+		small=[]
+		for i in range(len(every)):
+			if i==2:
+				small.append(quantities[count])
+			else:
+				small.append(every[i])
+				
+		count+=1
+		new_arr.append(small)
+	return new_arr	
 
 
 
@@ -499,20 +519,25 @@ def search_medicine(key):
 		if len(patient)==0:
 			return redirect(url_for("error_in_search"))
 
-		###########################for displaying alredy taken tests ################
+		###########################for displaying alredy taken medicine ################
 		test_search = sqlite3.connect("pharmacy.db")
 		d_search=test_search.cursor()
-		d_search.execute("Select Medicine_ID FROM track_medicine WHERE Patient_ID=? ", actual_key)
-				
+		d_search.execute("Select Medicine_ID, quantity_issued FROM track_medicine WHERE Patient_ID=? ", actual_key)
+		
+		
+		quantities=[]
 		already_medicine_taken_ID=[]
 		for k in d_search.fetchall():
-			already_medicine_taken_ID.append(k)
+			already_medicine_taken_ID.append((k[0],))
+			quantities.append(k[1])
+
+
 					
 		d_search.close()
 		test_search.close()
 
 		
-		#####geting price detailsof testsconducted already
+		#####geting price details of medicine prescribed to this patient already
 
 		already_test_search = sqlite3.connect("pharmacy.db")
 		dp_search=already_test_search.cursor()
@@ -522,6 +547,10 @@ def search_medicine(key):
 			dp_search.execute("Select * FROM medicine_master WHERE Medicine_ID=? ", each)
 			for k in dp_search.fetchall():
 				already_taken_medicine_details.append(k)
+
+
+		new_table=create_issued_med(already_taken_medicine_details,quantities)
+
 					
 		dp_search.close()
 		already_test_search.close()
@@ -542,15 +571,15 @@ def search_medicine(key):
 		name=(request.form['Medicine'],)
 
 	
-		#  "Diagnostics_master" is the table which store testID, names and charges of test to be conducted
+		#  " medicine_master" is the table which store medicine_ID, names and price of medicine to be issued
 		c_search.execute("Select * FROM medicine_master WHERE Medicine_name=? ", name)
 		
-		test_details=[]
+		medicine_details=[]
 		for j in c_search.fetchall():
-			test_details.append(j)
+			medicine_details.append(j)
 			quantity_available=int(j[2])
 
-		list_req=[list(test_details[0])]
+		list_req=[list(medicine_details[0])]
 		list_req[0][2]=quantity_required
 		c_search.close()
 		comsearch.close()
@@ -558,7 +587,8 @@ def search_medicine(key):
 			return redirect(url_for("error_in_search",value="quantity",quant=quantity_available))
 		else:
 			new_quantity=quantity_available-quantity_required
-			return render_template("add_medicine.html", test_details=list_req,already=already_taken_medicine_details, patient_detail=patient,issuedquant=quantity_required,new_quantity=new_quantity, pageTitle="Medicine details")
+			
+			return render_template("add_medicine.html", medicine_details=list_req,already=new_table, patient_detail=patient,issuedquant=quantity_required,new_quantity=new_quantity, pageTitle="Medicine details")
 	
 	return render_template("search_medicine.html",key=key)
 

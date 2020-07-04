@@ -63,7 +63,7 @@
 				<td><b>Quantity Issued</b></td>
                 <td><b>Price</b></td>
 			</tr>
-		{% for each in test_details %}
+		{% for each in medicine_details %}
 			<tr>
 			{% for i in each %}
 				<td>{{ i }} </td>
@@ -72,10 +72,14 @@
 		{% endfor %}
 		</table>
 		<br>
+		
+		<h3>quantity required={{issuedquant}} and now left={{new_quantity}} <h3>
+		<br>
+
 
 		<a href="{{ url_for('userHomepage') }}" class="button">Back to home</a><br>
 		<br>
-		<a href="{{ url_for('update_medicine', patientID=patient_detail[0][1], test_ID=test_details[0][0],issuedquant=issuedquant, new_quantity=new_quantity) }}" class="button">Update</a><br>
+		<a href="{{ url_for('update_medicine', patientID=patient_detail[0][1], medicine_ID=medicine_details[0][0],issuedquant=issuedquant, new_quantity=new_quantity) }}" class="button">Update</a><br>
 
 
 	</form>
