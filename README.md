@@ -12,14 +12,13 @@
 - [x] login page (basic)
 - [x] added authentication
 - [x] cookies
-- [ ] UI Enhancement
+- [x] UI Enhancement
      - [ ] Home Page
      - [x] Login Page
      - [x] Navbar
-     - [ ] About-us / Services / motto page (optional)
-- [ ] create medicines DB
-     - [ ] Get patient Details Screen
-     - [ ] Issue Medicines Screen
+- [x] create medicines DB
+     - [x] Get patient Details Screen
+     - [x] Issue Medicines Screen
 - [x] create diagnostics DB
      - [x] Get patient Details Screen 
      - [x] Diagnostics Screen
