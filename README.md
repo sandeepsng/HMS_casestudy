@@ -13,7 +13,7 @@
 - [x] added authentication
 - [x] cookies
 - [x] UI Enhancement
-     - [ ] Home Page
+     - [x] HOME Page
      - [x] Login Page
      - [x] Navbar
 - [x] create medicines DB
