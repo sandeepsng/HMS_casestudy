@@ -678,7 +678,9 @@ def test(id):
 	d = c.fetchone()
 	print(d)
 	return (f"{d[2]}")
-
+					    
+def getApp():
+    return app
 
 
 if __name__ == '__main__':
